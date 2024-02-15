@@ -2,6 +2,13 @@ vim.g.mapleader = " "
 local opts = { noremap = true, silent = true }
 local ts_builtin = require('telescope.builtin')
 
+vim.api.nvim_set_keymap('n', '<c-s-c>', '"+y', { noremap = true })
+vim.api.nvim_set_keymap('v', '<c-c>', '"+y', { noremap = true })
+vim.api.nvim_set_keymap('n', '<c-s-v>', '"+p', { noremap = true })
+vim.api.nvim_set_keymap('i', '<c-s-v>', '<c-r>+', { noremap = true })
+vim.api.nvim_set_keymap('c', '<c-v>', '<c-r>+', { noremap = true })
+-- vim.api.nvim_set_keymap('i', '<c-r>', '<c-v>', { noremap = true })
+
 -- debugging
 vim.keymap.set("n", "<F4>", ":lua require'dapui'.toggle()<CR>")
 vim.keymap.set("n", "<F5>", ":lua require'dap'.continue()<CR>")
@@ -11,6 +18,10 @@ vim.keymap.set("n", "<F12>", ":lua require'dap'.step_out()<CR>")
 vim.keymap.set("n", "<leader>b", ":lua require'dap'.toggle_breakpoint()<CR>")
 vim.keymap.set("n", "<leader>B", ":lua require'dap'.set_breakdpoint(vim.fn.input('Breakpoint condition: '))<CR>")
 vim.keymap.set("n", "<leader>lp", ":lua require'dap'.set_breakdpoint(nil, nil, vim.fn.input('Log point message: '))<CR>")
+vim.keymap.set('n', '<C-k>', ':wincmd k<CR>', {silent = true})
+vim.keymap.set('n', '<C-j>', ':wincmd j<CR>', {silent = true})
+vim.keymap.set('n', '<C-h>', ':wincmd h<CR>', {silent = true})
+vim.keymap.set('n', '<C-l>', ':wincmd l<CR>', {silent = true})
 
 -- File Opening
 function _G.telescope_files_vsplit()
@@ -34,21 +45,7 @@ function _G.telescope_new_tab()
     ts_builtin.find_files()
 end
 
-
 -- Tab management
--- vim.api.nvim_set_keymap('n', '<leader>pt', ':lua telescope_new_tab()<CR>', opts)
--- vim.keymap.set('n', '<leader>-Tab>', ':tabn', opts)
--- vim.keymap.set('n', '<leader>-S-Tab>', ':tabp', opts)
--- vim.keymap.set("n", "<leader>1", "1gt");
--- vim.keymap.set("n", "<leader>2", "2gt");
--- vim.keymap.set("n", "<leader>3", "3gt");
--- vim.keymap.set("n", "<leader>4", "4gt");
--- vim.keymap.set("n", "<leader>5", "5gt");
--- vim.keymap.set("n", "<leader>6", "6gt");
--- vim.keymap.set("n", "<leader>7", "7gt");
--- vim.keymap.set("n", "<leader>8", "8gt");
--- vim.keymap.set("n", "<leader>9", "9gt");
--- vim.keymap.set("n", "<leader>0", ":tablast<CR>");
 
 vim.keymap.set('n', '<leader>1', '<Cmd>BufferGoto 1<CR>', opts)
 vim.keymap.set('n', '<leader>2', '<Cmd>BufferGoto 2<CR>', opts)
@@ -60,6 +57,8 @@ vim.keymap.set('n', '<leader>7', '<Cmd>BufferGoto 7<CR>', opts)
 vim.keymap.set('n', '<leader>8', '<Cmd>BufferGoto 8<CR>', opts)
 vim.keymap.set('n', '<leader>9', '<Cmd>BufferGoto 9<CR>', opts)
 vim.keymap.set('n', '<leader>0', '<Cmd>BufferLast<CR>', opts)
+vim.keymap.set('n', '<leader>w', '<Cmd>BufferClose<CR>', opts)
+vim.keymap.set('n', '<leader>-s-w', '<Cmd>BufferClose<CR>', opts)
 
 -- vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 -- vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -95,3 +94,4 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 vim.keymap.set("n", "<leader>x", "<cmd>!chmod +x %<CR>", { silent = true })
 
 vim.keymap.set("n", "<leader>vpp", "<cmd>e ~/.dotfiles/nvim/.config/nvim/lua/theprimeagen/packer.lua<CR>");
+vim.keymap.set("n", "<C-n>", ":NERDTreeToggle<CR>");

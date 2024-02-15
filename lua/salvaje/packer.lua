@@ -69,6 +69,7 @@ return require('packer').startup(function(use)
     use("hrsh7th/cmp-nvim-lua")
     use("rafamadriz/friendly-snippets")
 
+    use { 'preservim/nerdtree' }
     use 'nvim-tree/nvim-web-devicons' -- OPTIONAL: for file icons
     use 'lewis6991/gitsigns.nvim'     -- OPTIONAL: for git status
     use 'romgrk/barbar.nvim'
@@ -79,13 +80,25 @@ return require('packer').startup(function(use)
     use 'rcarriga/nvim-dap-ui'
     use 'theHamsta/nvim-dap-virtual-text'
     use 'nvim-telescope/telescope-dap.nvim'
-    use { 'olexsmir/gopher.nvim',
-        ft = 'go',
-        config = function(_, opts)
-            require("gofer").setup(opts)
-        end,
-        build = function()
-            vim.cmd [[silent! GoInstallDeps]]
-        end,
+    -- use { 'olexsmir/gopher.nvim',
+    --     ft = 'go',
+    --     config = function(_, opts)
+    --         require("gopher").setup(opts)
+    --     end,
+    --     build = function()
+    --         vim.cmd [[silent! GoInstallDeps]]
+    --     end,
+    -- }
+    -- use {
+    --     "olexsmir/gopher.nvim",
+    --     requires = { -- dependencies
+    --         "nvim-lua/plenary.nvim",
+    --         "nvim-treesitter/nvim-treesitter",
+    --     },
+    --     cond = false
+    -- }
+    use {
+        "windwp/nvim-autopairs",
+        config = function() require("nvim-autopairs").setup {} end
     }
 end)
