@@ -18,7 +18,7 @@ end)
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
-    ensure_installed = { 'tsserver', 'rust_analyzer', 'pylsp' },
+    ensure_installed = { 'tsserver', 'rust_analyzer', 'ruff_lsp' },
     handlers = {
         lsp_zero.default_setup,
         lua_ls = function()
@@ -59,3 +59,6 @@ require('lspconfig').gopls.setup({
         },
     }
 })
+-- require 'lspconfig'.pyright.setup({
+--     cmd = { "pyright-langserver", "--maxLineLength", "120" },
+-- })
