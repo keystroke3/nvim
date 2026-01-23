@@ -121,12 +121,6 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagn
 -- [[ Yank Commands ]]
 vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y"]])
 vim.keymap.set('n', '<leader>Y', [["+Y"]])
--- [[ Basic Autocommands ]]
---  See `:help lua-guide-autocommands`
-
--- Highlight when yanking (copying) text
---  Try it with `yap` in normal mode
---  See `:help vim.highlight.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
@@ -138,7 +132,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 local opts = { noremap = true, silent = true }
 vim.keymap.set('n', '<leader>lr', '<Cmd>LspRestart<CR>', { desc = '[L]sp [R]estart' })
 
-vim.keymap.set('n', '<leader>v', '<Cmd>Markview toggle<CR>')
+vim.keymap.set('n', '<leader>m', '<Cmd>Markview toggle<CR>')
 
 -- BarBarVim Bindings
 vim.keymap.set('n', '<leader>1', '<Cmd>BufferGoto 1<CR>', opts)
@@ -152,10 +146,33 @@ vim.keymap.set('n', '<leader>8', '<Cmd>BufferGoto 8<CR>', opts)
 vim.keymap.set('n', '<leader>9', '<Cmd>BufferGoto 9<CR>', opts)
 vim.keymap.set('n', '<leader>0', '<Cmd>BufferLast<CR>', opts)
 vim.keymap.set('n', '<leader>w', '<Cmd>BufferClose<CR>', opts)
+vim.keymap.set('n', '<leader>n', '<Cmd>NvimTreeToggle<CR>')
+vim.keymap.set('n', '<leader>pn', function()
+  vim.cmd 'NvimTreeFindFile'
+  vim.cmd 'wincmd p'
+end, { desc = 'Find in file [N]vimTree' })
 
--- NvimTree Bindings
-vim.keymap.set('n', '<leader>nn', '<Cmd>NvimTreeToggle<CR>')
-vim.keymap.set('n', '<leader>nf', '<Cmd>NvimTreeFindFile<CR>')
+-- Toggle zoom for current window
+local zoomed = false
+local zoom_winid = nil
+
+function _G.toggle_zoom()
+  if zoomed and zoom_winid == vim.api.nvim_get_current_win() then
+    vim.cmd 'wincmd =' -- Equalize all windows
+    zoomed = false
+  else
+    vim.cmd 'wincmd |' -- Maximize width
+    vim.cmd 'wincmd _' -- Maximize height
+    zoom_winid = vim.api.nvim_get_current_win()
+    zoomed = true
+    vim.defer_fn(function()
+      vim.cmd 'NvimTreeFindFile'
+      vim.cmd 'wincmd p'
+    end, 50)
+  end
+end
+
+vim.keymap.set('n', '<leader>v', '<cmd>lua toggle_zoom()<CR>', { desc = 'Toggle zoom' })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info

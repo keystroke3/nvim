@@ -260,6 +260,7 @@ return {
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      local treesitter_search = require 'treesitter-search'
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -274,7 +275,6 @@ return {
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>pf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>ps', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -282,7 +282,36 @@ return {
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>pw', treesitter_search.search_symbol, { desc = '[P]roject [S]earch current symbol' })
+      vim.keymap.set('n', ',n', treesitter_search.next_result, { desc = 'Next search result' })
+      vim.keymap.set('n', ',p', treesitter_search.prev_result, { desc = 'Previous search result' })
 
+      vim.keymap.set('n', '<leader>pf', function()
+        builtin.find_files {
+          attach_mappings = function(prompt_bufnr, _)
+            local actions = require 'telescope.actions'
+            local action_state = require 'telescope.actions.state'
+
+            -- Override the default select action
+            actions.select_default:replace(function()
+              local selection = action_state.get_selected_entry()
+              actions.close(prompt_bufnr)
+
+              if selection then
+                -- Open the file
+                vim.cmd('edit ' .. selection.path)
+                -- Highlight it in nvim-tree
+                vim.defer_fn(function()
+                  vim.cmd 'NvimTreeFindFile'
+                  vim.cmd 'wincmd p'
+                end, 50)
+              end
+            end)
+
+            return true
+          end,
+        }
+      end, { desc = '[S]earch [F]iles' })
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -495,6 +524,7 @@ return {
         pyright = {},
         ts_ls = {},
         clangd = {},
+        rust_analyzer = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -874,7 +904,6 @@ return {
   -- require 'kickstart.plugins.debug',
   require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
-
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
   --
@@ -882,7 +911,6 @@ return {
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
   --
-
   {
     'mfussenegger/nvim-dap',
     dependencies = {
