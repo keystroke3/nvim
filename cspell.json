@@ -1,0 +1,27 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [],
+  "ignoreWords": [],
+  "flagWords": [],
+  "allowCompoundWords": true,
+  "languageSettings": [
+    {
+      "languageId": "*",
+      "includeRegExpList": [
+        "CStyleComment",
+        "String",
+        "CamelCase",
+        "snake_case",
+        "SCREAMING_SNAKE_CASE"
+      ],
+      "dictionaries": ["custom-words"]
+    }
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "custom-words",
+      "path": "./custom-dictionary.txt"
+    }
+  ]
+}
