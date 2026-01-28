@@ -15,13 +15,18 @@
         "snake_case",
         "SCREAMING_SNAKE_CASE"
       ],
-      "dictionaries": ["custom-words"]
+      "dictionaries": [
+        "custom-words"
+      ]
     }
   ],
   "dictionaryDefinitions": [
     {
       "name": "custom-words",
-      "path": "./custom-dictionary.txt"
+      "path": "${HOME}/.config/nvim/spell/en.utf-8.txt"
     }
+  ],
+  "userWords": [
+    "nvim"
   ]
 }
