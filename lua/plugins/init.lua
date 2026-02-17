@@ -6,7 +6,6 @@ return {
     dependencies = {
       'nvim-lua/plenary.nvim',
       'sindrets/diffview.nvim',
-
       'nvim-telescope/telescope.nvim',
     },
     config = function()
@@ -15,8 +14,9 @@ return {
           diffview = true, -- Enable diffview integration
         },
       }
+      -- Move keymap inside config function
+      vim.keymap.set('n', '<leader>g', '<Cmd>Neogit diff<CR>')
     end,
-    vim.keymap.set('n', '<leader>g', '<Cmd>Neogit diff<CR>'),
   },
 
   {
@@ -25,6 +25,7 @@ return {
       date_format = '%r %H:%M',
     },
   },
+
   {
     'folke/lazydev.nvim',
     ft = 'lua',
@@ -82,7 +83,6 @@ return {
         end)(),
       },
       'saadparwaiz1/cmp_luasnip',
-
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
     },
@@ -137,11 +137,12 @@ return {
       }
     end,
   },
+
   {
     'cryptomilk/nightcity.nvim',
     opts = {
-      style = 'afterlife', -- The theme comes in two styles: kabuki or afterlife
-      terminal_colors = true, -- Use colors used when opening a `:terminal`
+      style = 'afterlife',
+      terminal_colors = true,
       invert_colors = {
         cursor = true,
         diff = true,
@@ -167,7 +168,6 @@ return {
         groups['@lsp.typemod.variable.readonly'] = { italic = true }
       end,
     },
-
     init = function()
       vim.cmd.colorscheme 'nightcity'
     end,
@@ -175,30 +175,16 @@ return {
 
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
-  -- { -- Collection of various small independent plugins/modules
-  --   'echasnovski/mini.nvim',
-  --   config = function()
-  --     -- require('mini.ai').setup { n_lines = 500 }
-  --
-  --     require('mini.surround').setup()
-  --
-  --     local statusline = require 'mini.statusline'
-  --     statusline.setup { use_icons = vim.g.have_nerd_font }
-  --
-  --     -- statusline.section_location = function()
-  --     --   return '%2l:%-2v'
-  --     -- end
-  --   end,
-  -- },
   {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
   },
+
   {
     'romgrk/barbar.nvim',
     dependencies = {
-      'lewis6991/gitsigns.nvim', -- OPTIONAL: for git status
-      'nvim-tree/nvim-web-devicons', -- OPTIONAL: for file icons
+      'lewis6991/gitsigns.nvim',
+      'nvim-tree/nvim-web-devicons',
     },
     init = function()
       vim.g.barbar_auto_setup = false
@@ -213,8 +199,9 @@ return {
         Outline = { event = 'BufWinLeave', text = 'symbols-outline' },
       },
     },
-    version = '^1.0.0', -- optional: only update when a new 1.x version is released
+    version = '^1.0.0',
   },
+
   {
     'nvim-tree/nvim-tree.lua',
     version = '*',
@@ -226,13 +213,15 @@ return {
       require('nvim-tree').setup {}
     end,
   },
+
   { 'nvim-treesitter/nvim-treesitter-context' },
-  { -- Highlight, edit, and navigate code
+
+  {
     'nvim-treesitter/nvim-treesitter',
     dependencies = { 'OXY2DEV/markview.nvim' },
     lazy = false,
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+    main = 'nvim-treesitter.configs',
     opts = {
       ensure_installed = {
         'python',
@@ -260,9 +249,80 @@ return {
     },
   },
 
-  require 'plugins.lsp_config',
-  require 'plugins.dap',
-  require 'plugins.indent_line',
-  require 'plugins.autopairs',
-  require 'plugins.telescope',
+  -- which-key plugin
+  {
+    'folke/which-key.nvim',
+    event = 'VimEnter',
+    config = function()
+      require('which-key').setup {
+        icons = {
+          mappings = vim.g.have_nerd_font,
+          keys = vim.g.have_nerd_font and {} or {
+            Up = '<Up> ',
+            Down = '<Down> ',
+            Left = '<Left> ',
+            Right = '<Right> ',
+            C = '<C-…> ',
+            M = '<M-…> ',
+            D = '<D-…> ',
+            S = '<S-…> ',
+            CR = '<CR> ',
+            Esc = '<Esc> ',
+            ScrollWheelDown = '<ScrollWheelDown> ',
+            ScrollWheelUp = '<ScrollWheelUp> ',
+            NL = '<NL> ',
+            BS = '<BS> ',
+            Space = '<Space> ',
+            Tab = '<Tab> ',
+            F1 = '<F1>',
+            F2 = '<F2>',
+            F3 = '<F3>',
+            F4 = '<F4>',
+            F5 = '<F5>',
+            F6 = '<F6>',
+            F7 = '<F7>',
+            F8 = '<F8>',
+            F9 = '<F9>',
+            F10 = '<F10>',
+            F11 = '<F11>',
+            F12 = '<F12>',
+          },
+        },
+      }
+
+      require('which-key').add {
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+      }
+    end,
+  },
+  {
+    'coder/claudecode.nvim',
+    dependencies = { 'folke/snacks.nvim' },
+    config = true,
+    keys = {
+      { '<leader>a', nil, desc = 'AI/Claude Code' },
+      { '<leader>ac', '<cmd>ClaudeCode<cr>', desc = 'Toggle Claude' },
+      { '<leader>af', '<cmd>ClaudeCodeFocus<cr>', desc = 'Focus Claude' },
+      { '<leader>ar', '<cmd>ClaudeCode --resume<cr>', desc = 'Resume Claude' },
+      { '<leader>aC', '<cmd>ClaudeCode --continue<cr>', desc = 'Continue Claude' },
+      { '<leader>am', '<cmd>ClaudeCodeSelectModel<cr>', desc = 'Select Claude model' },
+      { '<leader>ab', '<cmd>ClaudeCodeAdd %<cr>', desc = 'Add current buffer' },
+      { '<leader>as', '<cmd>ClaudeCodeSend<cr>', mode = 'v', desc = 'Send to Claude' },
+      {
+        '<leader>as',
+        '<cmd>ClaudeCodeTreeAdd<cr>',
+        desc = 'Add file',
+        ft = { 'NvimTree', 'neo-tree', 'oil', 'minifiles', 'netrw' },
+      },
+      -- Diff management
+      { '<leader>aa', '<cmd>ClaudeCodeDiffAccept<cr>', desc = 'Accept diff' },
+      { '<leader>ad', '<cmd>ClaudeCodeDiffDeny<cr>', desc = 'Deny diff' },
+    },
+  },
 }
