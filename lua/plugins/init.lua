@@ -57,7 +57,7 @@ return {
       format_on_save = function(bufnr)
         local disable_filetypes = { c = true, cpp = true }
         return {
-          timeout_ms = 500,
+          timeout_ms = 750,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
@@ -218,35 +218,24 @@ return {
 
   {
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
     dependencies = { 'OXY2DEV/markview.nvim' },
     lazy = false,
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = {
-        'python',
-        'javascript',
-        'go',
-        'bash',
-        'java',
-        'c',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-      },
-      auto_install = true,
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
+    config = function()
+      require('nvim-treesitter').install {
+        'python', 'javascript', 'go', 'bash', 'java', 'c', 'diff',
+        'html', 'lua', 'luadoc', 'markdown', 'markdown_inline',
+        'query', 'vim', 'vimdoc',
+      }
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = '*',
+        callback = function()
+          pcall(vim.treesitter.start)
+          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+    end,
   },
 
   -- which-key plugin
@@ -324,5 +313,12 @@ return {
       { '<leader>aa', '<cmd>ClaudeCodeDiffAccept<cr>', desc = 'Accept diff' },
       { '<leader>ad', '<cmd>ClaudeCodeDiffDeny<cr>', desc = 'Deny diff' },
     },
+  },
+  {
+    'yanskun/gotests.nvim',
+    ft = 'go',
+    config = function()
+      require('gotests').setup()
+    end,
   },
 }

@@ -15,7 +15,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     },
     { 'nvim-telescope/telescope-ui-select.nvim' },
 
-    { 'nvim-tree/nvim-web-devicons', enabled = true },
+    { 'nvim-tree/nvim-web-devicons',            enabled = true },
   },
   config = function()
     local telescopeConfig = require 'telescope.config'
@@ -51,6 +51,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
         -- Custom preview title that works for all pickers
         dynamic_preview_title = true,
         preview = {
+          treesitter = false,
           -- Custom title function - gets called for every preview
           title = function(entry, bufnr)
             -- Try to get filename from various sources

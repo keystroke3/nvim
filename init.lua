@@ -67,6 +67,12 @@ vim.keymap.set('n', '<leader>pn', function()
   vim.cmd 'NvimTreeFindFile'
   vim.cmd 'wincmd p'
 end, { desc = 'Find in file [N]vimTree' })
+vim.keymap.set('n', '<leader>gg', function()
+  require('git_commit_popup').open()
+end, { desc = '[G]it commit notes' })
+
+vim.keymap.set('x', '/', '<C-\\><C-n>`</\\%V', { desc = 'Search forward within visual selection' })
+vim.keymap.set('x', '?', '<C-\\><C-n>`>?\\%V', { desc = 'Search backward within visual selection' })
 
 local zoomed = false
 local zoom_winid = nil
@@ -142,12 +148,24 @@ vim.api.nvim_create_autocmd('BufEnter', {
   end,
 })
 
+-- if a file indicates that we should not edit it, then we must not
+vim.api.nvim_create_autocmd({ 'BufReadPost' }, {
+  callback = function()
+    local first_line = vim.api.nvim_buf_get_lines(0, 0, 1, false)[1] or ''
+    if first_line:match 'DO NOT EDIT' then
+      vim.bo.readonly = true
+      vim.bo.modifiable = false
+    end
+  end,
+})
+
 vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained' }, {
   command = "if mode() != 'c' | checktime | endif",
   pattern = '*',
 })
 
 require('lazy').setup('plugins', {
+  change_detection = { enabled = false },
   ui = {
     icons = vim.g.have_nerd_font and {} or {
       cmd = '⌘',

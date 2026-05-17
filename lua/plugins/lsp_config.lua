@@ -2,10 +2,9 @@ return {
   'neovim/nvim-lspconfig',
   dependencies = {
     { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-    'williamboman/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
 
-    { 'j-hui/fidget.nvim', opts = {} },
+    { 'j-hui/fidget.nvim',       opts = {} },
 
     'hrsh7th/cmp-nvim-lsp',
   },
@@ -64,6 +63,12 @@ return {
           })
         end
 
+        if client and client.name == 'gopls' then
+          map('<leader>o', function()
+            client:exec_cmd { title = 'gc_details', command = 'gopls.gc_details', arguments = { vim.uri_from_bufnr(event.buf) } }
+          end, 'Toggle compiler [O]ptimizations')
+        end
+
         if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
           map('<leader>th', function()
             vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
@@ -75,85 +80,77 @@ return {
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-    local servers = {
-      jdtls = {},
-      gopls = {
-        ui = {
+    -- Apply capabilities globally to all servers
+    vim.lsp.config('*', { capabilities = capabilities })
+
+    -- require('mason-tool-installer').setup {
+    --   ensure_installed = { 'jdtls', 'gopls', 'typescript-language-server', 'clangd', 'rust-analyzer', 'lua-language-server', 'stylua' },
+    -- }
+
+    vim.lsp.config('lua_ls', {
+      settings = {
+        Lua = {
           completion = {
-            usePlaceholders = true,
-            completeFunctionCalls = true,
-            experimentalPostfixCompletions = true,
-          },
-          renameMovesSubpackages = true,
-        },
-        staticcheck = true,
-        matcher = 'Fuzzy',
-        analyses = {
-          unusedparams = true,
-          fieldalignment = true,
-        },
-      },
-      pyright = {},
-      ts_ls = {},
-      clangd = {},
-      rust_analyzer = {},
-      lua_ls = {
-        settings = {
-          Lua = {
-            completion = {
-              callSnippet = 'Replace',
-            },
+            callSnippet = 'Replace',
           },
         },
       },
-    }
-
-    local ensure_installed = vim.tbl_keys(servers or {})
-    vim.list_extend(ensure_installed, {
-      'stylua', -- Used to format Lua code
     })
-    require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-    require('mason-lspconfig').setup {
-      handlers = {
-        function(server_name)
-          local server = servers[server_name] or {}
-          server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-          require('lspconfig')[server_name].setup(server)
-        end,
+    vim.lsp.config('gopls', {
+      settings = {
+        gopls = {
+          usePlaceholders = true,
+          renameMovesSubpackages = true,
+          staticcheck = true,
+          matcher = 'Fuzzy',
+          analyses = {
+            unusedparams = true,
+            fillstruct = true,
+          },
+        },
       },
-    }
-    vim.lsp.enable 'cspell'
+    })
+
+    -- vim.lsp.config('ty', {
+    --   cmd = { 'ty', 'server' },
+    --   filetypes = { 'python' },
+    --   root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
+    -- })
+
     vim.lsp.config('cspell', {
       cmd = { 'cspell-lsp', '--stdio' },
       root_markers = { '.git', 'cspell.json' },
     })
-    vim.lsp.enable 'ltex'
-    vim.lsp.config('ltex', {
-      cmd = { 'ltex-ls' },
+    vim.lsp.enable 'cspell'
+
+    vim.lsp.config('harper_ls', {
+      cmd = { 'harper-ls', '--stdio' },
       filetypes = {
         'markdown',
         'tex',
-        'latex',
         'gitcommit',
-        'org',
         'restructuredtext',
         'text',
       },
       settings = {
-        ltex = {
-          language = 'en-US',
-          -- Point to your custom LanguageTool server
-          languageToolHttpServerUri = 'https://langtool.seek.cafe/', -- Change to your server URL
-          checkFrequency = 'save', -- or "edit"
-          enabled = true,
-
-          -- Custom dictionary (optional)
-          dictionary = {},
-          disabledRules = {},
-          hiddenFalsePositives = {},
+        ['harper-ls'] = {
+          linters = {
+            spell_check = true,
+            sentence_capitalization = true,
+          },
         },
       },
     })
+    vim.lsp.config('omnisharp', {
+      settings = {
+        RoslynExtensionsOptions = {
+          EnableAnalyzersSupport = true,
+          EnableImportCompletion = true,
+        },
+      },
+    })
+
+    vim.lsp.enable { 'harper_ls', 'jdtls', 'gopls', 'ts_ls', 'clangd', 'rust_analyzer', 'lua_ls', 'basedpyright', 'omnisharp' }
   end,
 }
