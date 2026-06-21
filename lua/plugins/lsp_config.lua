@@ -15,19 +15,6 @@ return {
         local map = function(keys, func, desc)
           vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
         end
-        vim.diagnostic.config {
-          virtual_text = {
-            format = function(diagnostic)
-              if diagnostic.code then
-                return string.format('%s [%s]', diagnostic.message, diagnostic.code)
-              else
-                return diagnostic.message
-              end
-            end,
-          },
-          signs = true,
-          underline = true,
-        }
 
         map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
         map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
@@ -62,8 +49,13 @@ return {
           })
         end
 
+        if client and client.name == 'harper_ls' then
+          vim.diagnostic.config({ virtual_text = false }, vim.lsp.diagnostic.get_namespace(client.id, false))
+          vim.diagnostic.config({ virtual_text = false }, vim.lsp.diagnostic.get_namespace(client.id, true))
+        end
+
         if client and client.name == 'gopls' then
-          map('<leader>o', function()
+          map('<leader>oo', function()
             client:exec_cmd { title = 'gc_details', command = 'gopls.gc_details', arguments = { vim.uri_from_bufnr(event.buf) } }
           end, 'Toggle compiler [O]ptimizations')
         end
@@ -76,10 +68,33 @@ return {
       end,
     })
 
+    -- Global diagnostic config (defined once, not per-LSP)
+    vim.diagnostic.config {
+      virtual_text = {
+        enabled = true,
+        format = function(diagnostic)
+          if diagnostic.code then
+            return string.format('%s [%s]', diagnostic.message, diagnostic.code)
+          else
+            return diagnostic.message
+          end
+        end,
+      },
+      signs = true,
+      underline = true,
+    }
+
     local capabilities = vim.lsp.protocol.make_client_capabilities()
     capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
     vim.lsp.config('*', { capabilities = capabilities })
+
+    -- Fix: default positionEncoding to 'utf-16' when not explicitly passed
+    local util = require 'vim.lsp.util'
+    local old_make_position_params = util.make_position_params
+    util.make_position_params = function(win, position_encoding)
+      return old_make_position_params(win, position_encoding or 'utf-16')
+    end
 
 
     vim.lsp.config('lua_ls', {
@@ -113,12 +128,6 @@ return {
     --   root_markers = { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', '.git' },
     -- })
 
-    vim.lsp.config('cspell', {
-      cmd = { 'cspell-lsp', '--stdio' },
-      root_markers = { '.git', 'cspell.json' },
-    })
-    vim.lsp.enable 'cspell'
-
     vim.lsp.config('harper_ls', {
       cmd = { 'harper-ls', '--stdio' },
       filetypes = {
@@ -137,6 +146,22 @@ return {
         },
       },
     })
+    if vim.uv.os_uname().sysname == 'Darwin' then
+      require('mason-tool-installer').setup {
+        ensure_installed = {
+          'gopls',
+          'typescript-language-server',
+          'clangd',
+          'rust-analyzer',
+          'lua-language-server',
+          'basedpyright',
+          'jdtls',
+          'csharp-language-server',
+          'harper-ls',
+        },
+      }
+    end
+
     vim.lsp.enable { 'harper_ls', 'jdtls', 'gopls', 'ts_ls', 'clangd', 'rust_analyzer', 'lua_ls', 'basedpyright', 'csharp_ls' }
   end,
 }

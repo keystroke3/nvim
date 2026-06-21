@@ -191,19 +191,7 @@ return {
       color = { fg = '#ffffff', gui = 'bold' },
     }
 
-    ins_right {
-      'o:encoding',
-      fmt = string.upper,
-      cond = conditions.hide_in_width,
-      color = { fg = colors.green, gui = 'bold' },
-    }
 
-    ins_right {
-      'fileformat',
-      fmt = string.upper,
-      icons_enabled = false,
-      color = { fg = colors.green, gui = 'bold' },
-    }
 
     ins_right {
       'branch',
@@ -231,5 +219,10 @@ return {
     }
 
     require('lualine').setup(config)
+
+    -- Allow memo zen mode to restore the full statusline
+    _G._lualine_restore = function()
+      require('lualine').setup(config)
+    end
   end,
 }

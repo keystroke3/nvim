@@ -8,7 +8,7 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = 'a'
 vim.opt.showmode = false
-vim.opt.spell = true
+-- vim.opt.spell = true  -- disabled globally; per-buffer on demand via <leader>e
 vim.opt.spelllang = 'en_us'
 vim.opt.spelloptions = 'camel'
 vim.opt.breakindent = true
@@ -163,6 +163,8 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'FocusGained' }, {
   command = "if mode() != 'c' | checktime | endif",
   pattern = '*',
 })
+
+require('memo').setup()
 
 require('lazy').setup('plugins', {
   change_detection = { enabled = false },
